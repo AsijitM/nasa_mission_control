@@ -14,7 +14,7 @@ jobs: #jobs when one of the two events is triggered
     strategy:
       matrix:
         node-version: [16.x, 18.x] #setting multiple versions for node
-        mongodb-version: [ '7.0']
+        mongodb-version: ['7.0']
     runs-on: ubuntu-latest #platform on the testing will done
     steps: #steps of our build job,these are reusuable scripts
       - uses: actions/checkout@v3 #uses the checkout action to use the latest version of our code
