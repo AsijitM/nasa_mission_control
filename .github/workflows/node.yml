@@ -1,25 +1,31 @@
-name: NASA Project CI
-on:
-  push:
-    branches: [main]
+name: NASA Project CI #name of the workflow
+on: #when the workflow will trigger
+  push: #on which event
+    branches: [main] #for which branch
   pull_request:
     branches: [main]
-jobs:
-  build:
-    # deploy:
-    #   needs: build
-    env:
-      CI: true
+jobs: #jobs when one of the two events is triggered
+  build: #we are testing on how to install and build so we call it build
+    # deploy:                                                     #this will run side by side
+    #   needs: build                                              #we can also make the build neccessary for the deployment
+    env: #specifyiing environment for the testing
+      CI: true #this will let the pipeline that we are using CI server and disable watch mode
+      MONGO_URL: mongodb://localhost/test
     strategy:
       matrix:
-        node-version: [16.x, 18.x]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js version ${{ matrix.node-verison }}
-        uses: actions/setup-node@v3
+        node-version: [16.x, 18.x] #setting multiple versions for node
+        mongodb-version: ['6.0', '7.0']
+    runs-on: ubuntu-latest #platform on the testing will done
+    steps: #steps of our build job,these are reusuable scripts
+      - uses: actions/checkout@v3 #uses the checkout action to use the latest version of our code
+      - name: Use Node.js version ${{ matrix.node-version }}
+        uses: actions/setup-node@v3 #setting up node on the server
         with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm install
-      - run: npm run build --prefix client
-      - run: npm test
+          node-version: ${{ matrix.node-version }} #specifying node version
+      - name: Use mongoDB from github Actions
+        uses: supercharge/mongodb-github-action@1.10.0 #it starts a mongoDB server specifically for the current job on the mongo default port
+        with:
+          mongodb-version: ${{matrix.mongodb-version}}
+      - run: npm install #running npm install for dependencies
+      - run: npm run build --prefix client #run the build on the front end code
+      - run: npm test #test the both server and client
